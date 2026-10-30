@@ -5,4 +5,4 @@ Layers (imports only point downwards):
     core  data, file formats, maths      (workbench/core/), never imports Qt
 Run:  .venv-wb/bin/python -m workbench
 """
-__version__ = "0.2.0"
+__version__ = "0.2.1"

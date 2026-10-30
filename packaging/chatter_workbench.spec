@@ -4,7 +4,7 @@
 import sys
 from pathlib import Path
 
-from PyInstaller.utils.hooks import collect_all, collect_submodules
+from PyInstaller.utils.hooks import collect_all, collect_submodules, copy_metadata
 
 ROOT = Path(SPECPATH).parent
 PKG = ROOT / "models" / "chatter_model_v2_chatter3"          # the deployed top-3 package, bundled
@@ -23,17 +23,18 @@ hidden = [
     "nidaqmx", "nidaqmx.system", "nidaqmx.stream_readers",
 ] + collect_submodules("sklearn.tree") + collect_submodules("sklearn.ensemble")
 ni_datas, ni_binaries, ni_hidden = collect_all("nidaqmx")      # its data files and every submodule
-hidden += ni_hidden
+nt_datas, nt_binaries, nt_hidden = collect_all("nitypes")     # nidaqmx reads its package metadata when imported
+hidden += ni_hidden + nt_hidden
 
 datas = [(str(PKG / f), "models/chatter_model_v2_chatter3")
          for f in ("meta.json", "extra_trees.joblib", "random_forest.joblib", "svm_y.joblib")]
 datas += [(str(ROOT / "workbench" / "app" / "fonts"), "workbench/app/fonts")]
-datas += ni_datas
+datas += ni_datas + nt_datas + copy_metadata("nitypes") + copy_metadata("nidaqmx")
 
 a = Analysis(
     [str(ROOT / "packaging" / "launch.py")],
     pathex=[str(ROOT), str(PKG)],
-    binaries=ni_binaries,
+    binaries=ni_binaries + nt_binaries,
     datas=datas,
     hiddenimports=hidden,
     excludes=["tkinter", "matplotlib", "torch", "IPython", "pytest",
