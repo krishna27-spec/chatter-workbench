@@ -50,4 +50,6 @@ jobs:
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create $env:GITHUB_REF_NAME (Get-Item build\ChatterWorkbench-Setup-*.exe).FullName --title $env:GITHUB_REF_NAME --notes 'Windows installer. Windows may warn that the publisher is unknown: choose More info, then Run anyway.'
+        run: |
+          $notes = 'Windows installer. Windows may warn that the publisher is unknown: choose More info, then Run anyway.'
+          gh release create $env:GITHUB_REF_NAME (Get-Item build\ChatterWorkbench-Setup-*.exe).FullName --title $env:GITHUB_REF_NAME --notes $notes
