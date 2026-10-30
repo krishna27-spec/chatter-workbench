@@ -1,0 +1,25 @@
+.venv*/
+__pycache__/
+.pytest_cache/
+build/
+*.spec.bak
+# recordings, labels and results never go in this repository
+/data/
+/results/
+/guide/
+/notes/
+*.lvm
+*.xlsx
+*.xls
+*.zip
+*.csv
+*.npy
+*.npz
+*.f32
+*.i16
+*.ipynb
+*.pptx
+*.pt
+# trained models: only the three shipped ones
+*.joblib
+!/models/chatter_model_v2_chatter3/*.joblib

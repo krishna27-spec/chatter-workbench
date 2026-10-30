@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chatter Workbench</title>
+<style>
+body{margin:0;font:16px/1.5 Arial,Helvetica,sans-serif;color:#1b2229;background:#fff}
+main{max-width:760px;margin:0 auto;padding:56px 24px}
+h1{font-size:34px;margin:0 0 8px;color:#22303c}
+p{margin:0 0 16px}.lead{font-size:18px;color:#4a5a6a}
+a.btn{display:inline-block;background:#1f6fb2;color:#fff;padding:12px 20px;font-weight:bold;text-decoration:none;margin:8px 0 28px}
+h2{font-size:18px;margin:28px 0 8px;color:#22303c}
+pre{background:#17202a;color:#e6edf3;padding:14px;overflow:auto;font-size:14px}
+li{margin-bottom:6px}
+</style></head><body><main>
+<h1>Chatter Workbench</h1>
+<p class="lead">Desktop software for chatter detection and spindle speed control in micromilling.</p>
+<a class="btn" href="https://github.com/krishna27-spec/chatter-workbench/releases/latest">Download for Windows</a>
+<h2>Install</h2>
+<ol>
+<li>Open the page above and download <b>ChatterWorkbench-Setup-&lt;version&gt;.exe</b>.</li>
+<li>Run it. The installer is not code-signed, so Windows may warn about an unknown publisher: choose <b>More info</b>, then <b>Run anyway</b>.</li>
+<li>For live use, also install the free NI-DAQmx driver. Opening recordings does not need it.</li>
+</ol>
+<h2>What it does</h2>
+<ul>
+<li>Opens <code>.lvm</code> and <code>.csv</code> recordings with time, spectrum and spectrogram views.</li>
+<li>Three trained models report no cutting, stable or chatter every 25.6 ms.</li>
+<li>Computes a new spindle speed with the Liao &amp; Young rule. Output is off by default, and suppression has not yet been shown on a machine.</li>
+</ul>
+<h2>From source</h2>
+<pre>git clone https://github.com/krishna27-spec/chatter-workbench.git</pre>
+<p><a href="https://github.com/krishna27-spec/chatter-workbench">Source code on GitHub</a></p>
+</main></body></html>

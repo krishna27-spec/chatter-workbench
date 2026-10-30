@@ -1,0 +1,53 @@
+name: Windows installer
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install the exact library versions
+        run: python -m pip install -r packaging/requirements.txt
+      - name: Draw the icon
+        run: python packaging/make_icon.py
+      - name: Pack the app
+        run: python -m PyInstaller --noconfirm --clean --log-level WARN --distpath build/dist --workpath build/work packaging/chatter_workbench.spec
+      - name: Self-test the packed app
+        shell: pwsh
+        run: |
+          $report = Join-Path ([Environment]::GetFolderPath('MyDocuments')) 'Chatter Workbench\self-test.txt'
+          $env:QT_QPA_PLATFORM = 'offscreen'
+          $p = Start-Process build\dist\ChatterWorkbench\ChatterWorkbench.exe -ArgumentList '--self-test' -PassThru
+          for ($i = 0; $i -lt 180 -and -not (Test-Path $report); $i++) { Start-Sleep -Seconds 1 }
+          if (-not $p.HasExited) { Stop-Process -Id $p.Id -Force }
+          if (-not (Test-Path $report)) { Write-Error 'self-test wrote no report'; exit 1 }
+          Get-Content $report
+          if (Select-String -Path $report -Pattern 'FAIL' -Quiet) { Write-Error 'self-test failed'; exit 1 }
+      - name: Make the installer
+        shell: pwsh
+        run: |
+          choco install innosetup --no-progress -y
+          $ver = python -c "import workbench; print(workbench.__version__)"
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DMyVersion=$ver" packaging\windows_installer.iss
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ChatterWorkbench-Setup
+          path: build/ChatterWorkbench-Setup-*.exe
+      - name: Attach to the release
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create $env:GITHUB_REF_NAME (Get-Item build\ChatterWorkbench-Setup-*.exe).FullName --title $env:GITHUB_REF_NAME --notes 'Windows installer. Windows may warn that the publisher is unknown: choose More info, then Run anyway.'
