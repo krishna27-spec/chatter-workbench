@@ -4,7 +4,7 @@
 import sys
 from pathlib import Path
 
-from PyInstaller.utils.hooks import collect_submodules
+from PyInstaller.utils.hooks import collect_all, collect_submodules
 
 ROOT = Path(SPECPATH).parent
 PKG = ROOT / "models" / "chatter_model_v2_chatter3"          # the deployed top-3 package, bundled
@@ -22,14 +22,18 @@ hidden = [
     "sklearn.svm", "joblib", "pywt", "pycatch22", "scipy.special", "scipy.ndimage", "scipy.signal",
     "nidaqmx", "nidaqmx.system", "nidaqmx.stream_readers",
 ] + collect_submodules("sklearn.tree") + collect_submodules("sklearn.ensemble")
+ni_datas, ni_binaries, ni_hidden = collect_all("nidaqmx")      # its data files and every submodule
+hidden += ni_hidden
 
 datas = [(str(PKG / f), "models/chatter_model_v2_chatter3")
          for f in ("meta.json", "extra_trees.joblib", "random_forest.joblib", "svm_y.joblib")]
 datas += [(str(ROOT / "workbench" / "app" / "fonts"), "workbench/app/fonts")]
+datas += ni_datas
 
 a = Analysis(
     [str(ROOT / "packaging" / "launch.py")],
     pathex=[str(ROOT), str(PKG)],
+    binaries=ni_binaries,
     datas=datas,
     hiddenimports=hidden,
     excludes=["tkinter", "matplotlib", "torch", "IPython", "pytest",

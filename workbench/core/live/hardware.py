@@ -31,8 +31,8 @@ def list_modules() -> tuple[list[Module], str | None]:
     """(modules, problem). No driver or an error → ([], a sentence saying why); never raises."""
     try:
         from nidaqmx.system import System
-    except ImportError:
-        return [], "NI-DAQmx (Python package nidaqmx) is not installed"
+    except ImportError as e:
+        return [], f"NI-DAQmx (Python package nidaqmx) is not installed: {e}"
     try:
         out = []
         for d in System.local().devices:
